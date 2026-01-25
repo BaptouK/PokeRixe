@@ -1,1 +1,33 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* Couleurs principales */
+  --primary-color: #ef6a9a;
+  --primary-light: #f4a8c1;
+  --primary-dark: #c74f7a;
+
+  --secondary-color: rgb(55, 199, 195);
+  --secondary-light: #87e1de;
+  --secondary-dark: #2b9f9b;
+
+  /* Fond et surfaces */
+  --background-color: #f8fbff;
+  --surface-color: #ffffff;
+
+  /* Textes */
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --text-white: #f8fbff;
+
+  /* Accent / Hover */
+  --accent-color: #ff92c2;
+  --secondary-accent-color: #166198;
+}
+
+body {
+  font-family: var(--text-primary);
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  color : var(--primary-color);
+}

@@ -31,3 +31,6 @@ body {
   padding: 0;
   color : var(--primary-color);
 }
+*{
+  text-decoration: none;
+}

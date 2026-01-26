@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, input} from '@angular/core';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-card',
@@ -7,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrl: './card.css',
 })
 export class Card {
+  value = input(0);
 
 }

@@ -4,6 +4,7 @@
 }
 
 .nav {
+  text-decoration: none;
   max-width: 70rem;
   margin: 0 auto;
   padding: 16px;
@@ -18,6 +19,7 @@
 
 .nav-item {
   font-size: 1.5rem;
+  text-decoration: none;
   color: var(--text-primary);
   cursor: pointer;
   font-weight: 500;

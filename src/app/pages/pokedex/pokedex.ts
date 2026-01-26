@@ -11,4 +11,11 @@ import {Card} from '../../shared/components/card/card';
 })
 export class Pokedex {
 
+  async ngOnInit() {
+    const response: any = await fetch('https://pokebuildapi.fr/api/v1/pokemon/generation/1').then(res => res.json());
+    console.log(response);
+
+  }
+
+
 }

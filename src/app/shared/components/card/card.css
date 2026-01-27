@@ -1,6 +1,6 @@
 .card{
   background: #2839b0;
-  height: 18rem;
+  height: 19rem;
   width: 15rem;
 }
 
@@ -13,10 +13,42 @@
   min-height: 65%;
   height: auto;
 
+}
 
+.top img {
+  /* border: 1px solid #ddd; */
+  border-radius: 4px;
+  padding: 8%;
+  width: 80%;
+  height: 80%;
 
 }
 
-.bottom{
+.bottom img {
+  /* border: 1px solid #ddd; */
+  height: 4rem;
+  width: auto;
+  object-fit: contain ;
+}
 
+.bottom{
+  border-top: 1px solid #ddd;
+  display:flex;
+}
+
+.bottom p{
+  color: white;
+  text-align: left;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+.types {
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  gap: 1rem;
+
+  height: 100%;
+  width:100%;
 }

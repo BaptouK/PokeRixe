@@ -1,13 +1,18 @@
-import {Component, input} from '@angular/core';
-import {NgOptimizedImage} from '@angular/common';
+import {Component, Input, input} from '@angular/core';
+import {NgForOf, NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-card',
-  imports: [],
+  imports: [
+    NgForOf
+  ],
   templateUrl: './card.html',
   styleUrl: './card.css',
+
 })
 export class Card {
-  value = input(0);
 
+  @Input() name: string = '';
+  @Input() sprite: string = '';
+  @Input() apiTypes: { name: string, image: string }[] = []; // Accepte les objets complets
 }

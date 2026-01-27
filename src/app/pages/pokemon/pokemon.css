@@ -1,0 +1,23 @@
+.pokemon {
+  display: flex;
+}
+
+.pokemon .left{
+  background-color: #794040;
+  width: 30%;
+}
+
+.pokemon .right{
+  background-color: #c7d040;
+  margin-left: auto;
+  width: 100%;
+
+}
+
+.pokemon h1{
+  text-align: center;
+  font-size: 5rem;
+
+  margin: 0;
+  margin-top: 0.5rem;
+}

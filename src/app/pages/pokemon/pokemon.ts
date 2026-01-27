@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {ChangeDetectorRef, Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {ApiPokemons} from '../../shared/services/api-pokemons';
 
 @Component({
   selector: 'app-pokemon',
@@ -9,14 +10,29 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class Pokemon {
 
-  constructor(private route: ActivatedRoute) {
-  }
+  constructor(private route: ActivatedRoute,
+              private apiPokemon : ApiPokemons,
+              private cdr : ChangeDetectorRef
+  ) {}
 
-  async ngOnInit() {
+  isLoading : boolean = true;
+  pokemon : any;
+
+  ngOnInit() {
     const id = String(this.route.snapshot.paramMap.get('id'));
-    const response: any = await fetch('https://pokebuildapi.fr/api/v1/pokemon/'+ id).then(res => res.json());
-
-
+    this.apiPokemon.getPokemon(id).subscribe({
+      next: (pokemon) => {
+        this.pokemon = pokemon;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur lors de la récupération du Pokémon:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
 
   }
+
 }

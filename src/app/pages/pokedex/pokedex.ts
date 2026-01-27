@@ -1,5 +1,8 @@
   import {Component, ComponentRef, ViewChild, ViewContainerRef} from '@angular/core';
   import {Card} from '../../shared/components/card/card';
+  import {HttpClient} from '@angular/common/http';
+  import {Router} from '@angular/router';
+  import {ApiPokemons} from '../../shared/services/api-pokemons';
 
   @Component({
     selector: 'app-pokedex',
@@ -14,13 +17,19 @@
     @ViewChild('pokemonContainer', { read: ViewContainerRef })
     pokemonContainer!: ViewContainerRef;
 
-    async ngAfterViewInit() { // Utilise ngAfterViewInit pour accéder à @ViewChild
-      const response: any = await fetch('https://pokebuildapi.fr/api/v1/pokemon/generation/1')
-        .then(res => res.json());
+    isLoading = false;
+    errorMessage : string | null = null;
 
-      for (const pokemon of response) {
-        this.addPokemonCard(pokemon);
-      }
+    constructor(private apiPokemon : ApiPokemons) {}
+
+    ngOnInit() : void {
+      this.isLoading = true;
+      this.apiPokemon.getPokedex().subscribe(pokedex => {
+        for (let pokemon of pokedex) {
+          this.addPokemonCard(pokemon);
+        }
+
+      })
     }
 
     addPokemonCard(pokemon: { image: string, name: string, apiTypes: { name: string }[] } ) {
@@ -36,6 +45,12 @@
       // Passe les données au composant
       cardRef.instance.name = pokemon.name;
       cardRef.instance.sprite = pokemon.image;
+    }
+
+    ngOnDestroy() {
+      if (this.apiPokemon) {
+        // this.apiPokemon.unsu
+      }
     }
 
   }

@@ -1,12 +1,5 @@
 
-.title {
-  background-color: #87e1de;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  list-style: none;
-  padding: 1rem;
-}
+
 
 .left{
   margin-left: 2rem;

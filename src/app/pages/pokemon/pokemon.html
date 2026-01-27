@@ -1,1 +1,36 @@
-<p>pokemon works!</p>
+@if (isLoading) {
+  <h1>Loading...</h1>
+} @else {
+  @if (pokemon) {
+    <div class="title">
+      <div class="left">
+        <h1>{{ pokemon.name }}</h1>
+        <h2>Fire Flying</h2>
+      </div>
+      <div class="right"></div>
+    </div>
+
+    <div class="pokemon">
+
+      <div class="left">
+        <img [src]="pokemon.image" alt="prout" />
+        <h2>Taille</h2>
+        <h2>Poid</h2>
+
+      </div>
+
+
+      <div class="right">
+        <h1>Statistiques</h1>
+        <h2>Attaque defense etc...</h2>
+        <h1>Attaque Disponible</h1>
+      </div>
+
+
+    </div>
+
+
+  } @else {
+    <h1>Aucun Pokémon trouvé.</h1>
+  }
+}

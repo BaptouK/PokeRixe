@@ -1,10 +1,12 @@
 import {Component, Input, input} from '@angular/core';
-import {NgForOf, NgOptimizedImage} from '@angular/common';
+import { NgOptimizedImage} from '@angular/common';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-card',
   imports: [
-    NgForOf
+    RouterLink
+
   ],
   templateUrl: './card.html',
   styleUrl: './card.css',

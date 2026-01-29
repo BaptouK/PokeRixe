@@ -1,10 +1,13 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {ApiPokemons} from '../../shared/services/api-pokemons';
+import {Stats} from '../../shared/components/stats/stats';
 
 @Component({
   selector: 'app-pokemon',
-  imports: [],
+  imports: [
+    Stats
+  ],
   templateUrl: './pokemon.html',
   styleUrl: './pokemon.css',
 })
@@ -23,6 +26,7 @@ export class Pokemon {
     this.apiPokemon.getPokemon(id).subscribe({
       next: (pokemon) => {
         this.pokemon = pokemon;
+        console.log(pokemon);
         this.isLoading = false;
         this.cdr.detectChanges();
       },

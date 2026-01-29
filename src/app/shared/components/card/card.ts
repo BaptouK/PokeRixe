@@ -10,8 +10,8 @@ import {RouterLink} from '@angular/router';
   ],
   templateUrl: './card.html',
   styleUrl: './card.css',
-
 })
+
 export class Card {
 
   @Input() name: string = '';

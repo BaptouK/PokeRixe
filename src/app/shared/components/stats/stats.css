@@ -3,5 +3,36 @@
   border: 4px solid #ddd;
   display: flex;
   flex-direction: column;
+  justify-content: right;
+  margin: 0;
+  padding: 2rem;
   gap: 1rem;
+}
+
+.stat{
+  gap: 1.5rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  align-items: center;
+
+  margin: 0;
+  padding: 0;
+  padding-right: 1.5rem;
+}
+
+.statValue{
+  display: flex;
+  justify-content: right;
+  font: bold 2.5rem "Roboto", sans-serif;
+  width: 4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.statName {
+  font-size : 2.5rem;
+  margin: 0;
+  padding: 0;
 }

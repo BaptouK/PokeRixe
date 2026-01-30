@@ -1,18 +1,21 @@
 import {Component, Input} from '@angular/core';
+import {ProgressBar} from '../progress-bar/progress-bar';
+import {PokeStats} from '../../services/model/pokeStats';
 
 @Component({
   selector: 'app-stats',
-  imports: [],
+  imports: [
+    ProgressBar
+  ],
   templateUrl: './stats.html',
   styleUrl: './stats.css',
 })
 export class Stats {
-  @Input() stats: { } = []; // Accepte les objets complets
+  @Input() stats: PokeStats = {} as PokeStats; // Typage explicite
+  //statistiques  = new PokemonStats();
 
   ngOnInit() {
-    console.log(this.stats);
-    console.log("Prout");
-    console.log(Object.keys(this.stats));
+    console.log("baba",this.stats);
   }
 
 }

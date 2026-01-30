@@ -9,9 +9,12 @@
 
 .pokemon .right{
   background-color: #c7d040;
-  margin-left: auto;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
+  width: 100%;
+  padding: 1rem 5rem;
 }
 
 .pokemon h1{
@@ -20,4 +23,5 @@
 
   margin: 0;
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }

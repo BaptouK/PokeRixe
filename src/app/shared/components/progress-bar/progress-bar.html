@@ -1,0 +1,8 @@
+<div class="bar">
+  <div
+    class="percentage has-tip"
+  [ngStyle]="{'width': Math.min((value / 255) * 100, 100) + '%'}"
+  [attr.data-perc]="200"
+  ></div>
+  <!-- 255 est la stats la plus grande du jeu -->
+</div>

@@ -2,11 +2,13 @@ import {ChangeDetectorRef, Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {ApiPokemons} from '../../shared/services/api-pokemons';
 import {Stats} from '../../shared/components/stats/stats';
+import {Type} from '../../shared/components/type/type';
 
 @Component({
   selector: 'app-pokemon',
   imports: [
-    Stats
+    Stats,
+    Type
   ],
   templateUrl: './pokemon.html',
   styleUrl: './pokemon.css',

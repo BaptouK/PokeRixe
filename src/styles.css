@@ -2,31 +2,15 @@
 
 :root {
   /* Couleurs principales */
-  --primary-color: #ef6a9a;
-  --primary-light: #f4a8c1;
-  --primary-dark: #c74f7a;
-
-  --secondary-color: rgb(55, 199, 195);
-  --secondary-light: #87e1de;
-  --secondary-dark: #2b9f9b;
-
-  /* Fond et surfaces */
-  --background-color: #f8fbff;
-  --surface-color: #ffffff;
-
-  /* Textes */
-  --text-primary: #1a1a1a;
-  --text-secondary: #555555;
-  --text-white: #f8fbff;
-
-  /* Accent / Hover */
-  --accent-color: #ff92c2;
-  --secondary-accent-color: #166198;
+  --base-color: hsl(25, 60%, 43%);
+  --primary-color: hsl(from var(--base-color) h s calc(l + 10));
+  --secondary-color: hsl(from var(--base-color) h s calc(l + 20));
+  --base-darker: hsl(from var(--base-color) h s calc(l - 5));
+  --base-black: hsl(from var(--base-color) h s calc(l - 10));
 }
 
 body {
-  font-family: var(--text-primary);
-  background-color: var(--background-color);
+  background-color: var(--base-darker);
   margin: 0;
   padding: 0;
   color : var(--primary-color);
@@ -34,10 +18,12 @@ body {
 
 *{
   text-decoration: none;
+  color:white;
 }
 
 .title {
-  background-color: #87e1de;
+  color:white;
+  background-color: var(--base-color);
   display: flex;
   align-items: center;
   gap: 24px;

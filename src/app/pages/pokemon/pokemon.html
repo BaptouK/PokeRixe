@@ -5,7 +5,12 @@
     <div class="title">
       <div class="left">
         <h1>{{ pokemon.name }}</h1>
-        <h2>Fire Flying</h2>
+        <div class="type">
+          @for (type of pokemon.apiTypes ; track type.name){
+            <app-type type="mamamiam"></app-type>
+          }
+        </div>
+
       </div>
       <div class="right"></div>
     </div>
@@ -14,8 +19,8 @@
 
       <div class="left">
         <img [src]="pokemon.image" alt="prout" />
-        <h2>Taille</h2>
-        <h2>Poid</h2>
+        <h2>Taille  60cm</h2>
+        <h2>Poid 12Kg</h2>
 
       </div>
 

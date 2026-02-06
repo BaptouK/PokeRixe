@@ -1,5 +1,5 @@
 .card{
-  background: #2839b0;
+  background: var(--base-color);
   height: 19rem;
   width: 15rem;
 }

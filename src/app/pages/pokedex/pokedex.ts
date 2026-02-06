@@ -27,7 +27,7 @@
         for (let pokemon of pokedex) {
           this.addPokemonCard(pokemon);
         }
-
+        console.log(pokedex);
       })
     }
 

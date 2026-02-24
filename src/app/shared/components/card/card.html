@@ -5,14 +5,21 @@
   </div>
 
   <div class="bottom">
-    <p>{{name}}</p>
 
-
+    <div class="desc-top">
+    <p id="animation">{{name}}</p>
+    <p id="animation">#{{pokedex_id}}</p>
+    </div>
+    <div class="desc-bottom">
+    <app-type type="Electrique"></app-type>
+    <app-type type="Poison"></app-type>
+    </div>
+    <!-- Affichage des types du pokémon
     <div *ngFor="let type of apiTypes" class="type">
       <img [src]="type.image" [alt]="type.name" class="type-icon">
-      <!-- <span>{{ type.name }}</span> -->
-    </div>
 
+    </div>
+  -->
 
   </div>
 

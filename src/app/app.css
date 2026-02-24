@@ -1,1 +1,17 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
 
+/* NOTE: moved the global blurred background into src/styles.css to avoid duplication
+   and view-encapsulation issues. Keep component styles here. */
+
+/* Contenu non flouté */
+.content {
+  position: relative; /* Assure que le contenu reste au-dessus du fond */
+  z-index: 1;
+  padding: 20px; /* Espacement si nécessaire */
+}

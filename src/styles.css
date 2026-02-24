@@ -1,32 +1,90 @@
-/* You can add global styles to this file, and also import other style files */
-
-:root {
-  /* Couleurs principales */
-  --base-color: hsl(25, 60%, 43%);
-  --primary-color: hsl(from var(--base-color) h s calc(l + 10));
-  --secondary-color: hsl(from var(--base-color) h s calc(l + 20));
-  --base-darker: hsl(from var(--base-color) h s calc(l - 5));
-  --base-black: hsl(from var(--base-color) h s calc(l - 10));
+@font-face {
+  font-family: "8Bitbis";
+  src: url("../public/font/8-bit-hud.ttf");
 }
 
+@font-face {
+  font-family: "8Bit";
+  src: url("../public/font/8-bit-bold.ttf");
+}
+
+@font-face {
+  font-family: "8Bit";
+  src: url("../public/font/8-bit.ttf");
+}
+
+:root {
+  /* Couleur de base (noir) */
+  --base-h: 0;
+  --base-s: 0%;
+  --base-l: 0%;
+
+  /* Couleurs dérivées */
+  --primary-color: hsl(var(--base-h), var(--base-s), calc(var(--base-l) + 10%));
+  --secondary-color: hsl(var(--base-h), var(--base-s), calc(var(--base-l) + 20%));
+  --base-darker: hsl(var(--base-h), var(--base-s), calc(var(--base-l) - 5%));
+  --base-black: hsl(var(--base-h), var(--base-s), calc(var(--base-l) - 10%));
+
+  /* Autres variables (correctes) */
+  --color-gray-800: oklch(27.8% 0.033 256.848);
+  --light-gray: #8a8a8a;
+  --card-outline: #FFCB05;
+  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+
 body {
+  /* ensure a dark base under the blurred image to avoid white halos */
   background-color: var(--base-darker);
   margin: 0;
   padding: 0;
-  color : var(--primary-color);
+  /*color : var(--primary-color); */
+
+  /* supprimé: background-image / background-size / background-position / background-attachment
+   pour laisser le pseudo-élément ::before gérer l'image floutée */
+  min-height: 100vh; /* Assurez-vous que l'élément a une hauteur suffisante */
+  position: relative;
+  overflow: auto; /* Permet aux enfants de défiler */
+
+  font-family: "8Bit";
 }
 
-*{
+#pokeFont {
+  font-family: var(--font-sans);
+  color: var(--card-outline);
+  -webkit-text-stroke: 1.5px rgb(42, 69, 128);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; /* keep 0 and use scale to avoid transparent edges */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/img.png"); /* public root image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  filter: blur(30px);
+  transform: scale(1.03); /* grow slightly so blur doesn't show transparent edges */
+  transform-origin: center;
+  z-index: -1;
+  pointer-events: none;
+  /* create a subtle overlay so any underlying page background isn't visible through the blur edges */
+  box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.15) inset;
+}
+
+
+* {
   text-decoration: none;
-  color:white;
+  /* color:white; */
+
 }
 
-.title {
-  color:white;
-  background-color: var(--base-color);
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  list-style: none;
-  padding: 1rem;
+.separator {
+  height: 3px;
+  border-radius: 3px;
+  background-color: var(--card-outline);
+  margin: 1rem 0.4rem;
 }

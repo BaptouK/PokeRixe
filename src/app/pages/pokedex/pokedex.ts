@@ -31,7 +31,7 @@
       })
     }
 
-    addPokemonCard(pokemon: { image: string, name: string, apiTypes: { name: string }[] } ) {
+    addPokemonCard(pokemon: { pokedexId : number, image: string, name: string, apiTypes: { name: string }[] } ) {
       // Crée dynamiquement le composant Card
 
       //console.log(pokemon);
@@ -44,6 +44,8 @@
       // Passe les données au composant
       cardRef.instance.name = pokemon.name;
       cardRef.instance.sprite = pokemon.image;
+      cardRef.instance.pokedex_id = pokemon.pokedexId.toString();
+
     }
 
     ngOnDestroy() {

@@ -2,28 +2,46 @@
   <h1>Loading...</h1>
 } @else {
   @if (pokemon) {
-    <div class="title">
-      <div class="left">
-        <h1>{{ pokemon.name }}</h1>
-        <div class="type">
-          @for (type of pokemon.apiTypes ; track type.name){
-            <app-type type="mamamiam"></app-type>
-          }
-        </div>
+    <div class="pokemon-container">
 
+    <div class="title">
+      <div class="id-type">
+
+        <h2 id="pokeId">#{{ pokemon.id}}</h2>
+
+          @for (type of pokemon.apiTypes ; track type.name){
+            <app-type type="{{type.name}}"></app-type>
+          }
       </div>
-      <div class="right"></div>
+
+      <h1 id="pokeName">{{ pokemon.name }}</h1>
+
     </div>
+
+      <div class="separator"></div>
 
     <div class="pokemon">
 
       <div class="left">
-        <img [src]="pokemon.image" alt="prout" />
-        <h2>Taille  60cm</h2>
-        <h2>Poid 12Kg</h2>
+
+        <div class="img">
+          <img [src]="pokemon.image" alt="prout" />
+        </div>
+
+        <div class="taille-poid">
+
+        <div class="taille-poid-item">
+        <h3 id="desc">Taille</h3>
+        <h3 id="value">600 cm</h3>
+        </div>
+
+        <div class="taille-poid-item">
+        <h3 id="desc">Poids</h3>
+        <h3 id="value">122 Kg</h3>
+        </div>
+        </div>
 
       </div>
-
 
       <div class="right">
         <h1>Statistiques</h1>
@@ -31,6 +49,7 @@
       </div>
 
 
+    </div>
     </div>
 
 

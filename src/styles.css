@@ -82,6 +82,11 @@ body::before {
 
 }
 
+*:visited {
+  text-decoration: none;
+  color:white;
+}
+
 .separator {
   height: 3px;
   border-radius: 3px;

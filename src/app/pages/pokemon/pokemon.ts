@@ -3,12 +3,14 @@ import {ActivatedRoute} from '@angular/router';
 import {ApiPokemons} from '../../shared/services/api-pokemons';
 import {Stats} from '../../shared/components/stats/stats';
 import {Type} from '../../shared/components/type/type';
+import {StarStats} from '../../shared/components/star-stats/star-stats';
 
 @Component({
   selector: 'app-pokemon',
   imports: [
     Stats,
-    Type
+    Type,
+    StarStats
   ],
   templateUrl: './pokemon.html',
   styleUrl: './pokemon.css',

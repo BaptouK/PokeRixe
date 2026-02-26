@@ -1,26 +1,33 @@
 .header {
   background-color: var(--color-gray-800);
   border-bottom: 2px solid var(--light-gray);
-  position: sticky  ; /* create stacking context so z-index works */
+  position: sticky;
   z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 8rem;
-}
+  display: flex;
+  align-items: center;
 
-a {
-  color: white;
+  color : white;
 }
 
 .nav {
-
-  text-decoration: none;
-  max-width: 70rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100rem;
   margin: 0 auto;
-  padding: 10rem;
+  padding: 0 2rem;
   width: 100%;
   height: 100%;
+  position: relative;
+}
+
+.nav-left {
+  color: white;
+  font-size: 5rem;
+  font-weight: 500;
+  margin-right: auto;
+  margin-left: 2rem;
 }
 
 .nav-list {
@@ -28,34 +35,70 @@ a {
   align-items: center;
   gap: 24px;
   list-style: none;
-  color : white;
+  color: white;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0;
 }
 
 .nav-item {
-  font-size: 1.5rem;
-  text-decoration: none;
+  font-size: 2rem;
   color: white;
   cursor: pointer;
   font-weight: 500;
+  padding: 0.5rem 1rem; /* Espace autour du texte */
+  border-radius: 4px; /* Coins légèrement arrondis */
+  transition: all 0.3s ease; /* Animation fluide */
 }
 
-.nav-item:hover {
-  color: red;
-  background-color: #d92aae;
-  border : #7e85d9 4px solid;
+.nav-item:hover  {
+  background: rgba(255, 255, 255, 0.1); /* Fond légèrement transparent */
+  border-bottom: 2px solid var(--card-outline); /* Bordure rouge en bas */
+  transform: translateY(-2px); /* Légère élévation */
 }
 
-.nav-item--user {
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.1); /* Fond légèrement transparent */
+  border-bottom: 2px solid var(--card-outline); /* Bordure rouge en bas */
+  transform: translateY(-2px); /* Légère élévation */
+}
+
+.nav-user {
+  color: white;
+  font-size: 2rem;
+  font-weight: 500;
   margin-left: auto;
 }
 
+.nav-user:hover  {
+  background: rgba(255, 255, 255, 0.1); /* Fond légèrement transparent */
+  border-bottom: 2px solid var(--card-outline); /* Bordure rouge en bas */
+  transform: translateY(-2px); /* Légère élévation */
+}
+
 @media (max-width: 768px) {
-  .nav-list {
+  .nav {
     flex-wrap: wrap;
-    gap: 16px;
+    padding: 0 1rem;
   }
 
-  .nav-item--user {
+  .nav-list {
+    position: static;
+    transform: none;
+    justify-content: center;
+    width: 100%;
+    order: 2;
+  }
+
+  .nav-left {
+    order: 1;
+    margin-right: 2rem;
+  }
+
+  .nav-user {
+    order: 3;
     margin-left: 0;
   }
 }

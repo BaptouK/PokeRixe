@@ -9,8 +9,8 @@
 
         <h2 id="pokeId">#{{ pokemon.id}}</h2>
 
-          @for (type of pokemon.apiTypes ; track type.name){
-            <app-type type="{{type.name}}"></app-type>
+          @for (type of pokemon.types ; track type){
+            <app-type type="{{type}}"></app-type>
           }
       </div>
 

@@ -11,8 +11,9 @@
     <p id="animation">#{{pokedex_id}}</p>
     </div>
     <div class="desc-bottom">
-    <app-type type="Electrique"></app-type>
-    <app-type type="Poison"></app-type>
+      @for (type of types ;  track type) {
+        <app-type type="{{type}}"></app-type>
+      }
     </div>
     <!-- Affichage des types du pokémon
     <div *ngFor="let type of apiTypes" class="type">

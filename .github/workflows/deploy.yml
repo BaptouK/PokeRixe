@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Builder l'app
-        run: npm run build -- --configuration production --base-href /pokerixe/
+        run: npm run build -- --configuration production --base-href /PokeRixe/
 
       - name: Déployer sur GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

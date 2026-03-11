@@ -8,7 +8,6 @@ import {Type} from '../type/type';
   imports: [
     RouterLink,
     Type
-
   ],
   templateUrl: './card.html',
   styleUrl: './card.css',

@@ -34,10 +34,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Generate Compodoc
-        run: npx compodoc -p tsconfig.json --output docs --no-open
+        run: npx compodoc -p tsconfig.json --output docs
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

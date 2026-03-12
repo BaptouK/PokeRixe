@@ -11,10 +11,12 @@ Documentation technique : ``baptouk.github.io/PokeRixe/``
 
 ## 📋 Fonctionnalités
 
-- Consultation du Pokédex et des fiches détaillées de chaque créature
-- Création et gestion des équipes du joueur
-- Défi et combat tour par tour entre joueurs
-
+- [x] Consultation du Pokédex
+- [x] Consultation de chaque créature
+- [ ] Attaques disponible pour chaque pokemon
+- [ ] CRUD des équipes (ajout/suppression de créatures, modification de l'ordre...)
+- [ ] CRUD des utilisateurs (inscription, connexion, gestion du profil)
+- [ ] Interface de combat
 ---
 
 ## 🏗️ Stack technique

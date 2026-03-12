@@ -37,7 +37,7 @@ jobs:
         run: npm install
 
       - name: Generate Compodoc
-        run: npx compodoc -p tsconfig.json --outputFolder docs --no-open
+        run: npx compodoc -p tsconfig.json --output docs --no-open
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

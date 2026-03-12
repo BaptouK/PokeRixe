@@ -2,22 +2,25 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Pokemon } from '../../shared/models/pokemon.model';
 import { PokemonService } from '../../shared/services/pokemon.service';
 
+/**
+ * Store pour gérer l'état des Pokémon dans l'application.
+ * Sert a optimiser l'application avec un cache simple pour éviter les appels redondants.
+ */
 @Injectable({ providedIn: 'root' })
 export class PokemonStore {
   private readonly pokemonService = inject(PokemonService);
 
-  // État
   private readonly _pokemons = signal<Pokemon[]>([]);
   private readonly _loading = signal(false);
   private readonly _error = signal<string | null>(null);
   private readonly _lastFetch = signal<number | null>(null);
 
-  // Exposé en lecture seule
   pokemons = this._pokemons.asReadonly();
-  loading = this._loading.asReadonly();
-  error = this._error.asReadonly();
 
-  // Cache de 5 minutes
+  /**
+   * Durée de validité du cache en millisecondes (5 minutes).
+   * @private
+   */
   private readonly CACHE_DURATION = 5 * 60 * 1000;
 
   private isCacheValid(): boolean {
@@ -25,8 +28,12 @@ export class PokemonStore {
     return last !== null && (Date.now() - last) < this.CACHE_DURATION;
   }
 
+  /**
+   * Charge les 150 premiers Pokémon depuis l'API si le cache est invalide.
+   * Met à jour les signaux de chargement et d'erreur en conséquence.
+   * Si le cache est valide, ne fait rien pour éviter les appels redondants.
+   */
   loadFirst150(): void {
-    // ✅ Déjà en mémoire et cache valide → on ne refait pas l'appel
     if (this.isCacheValid()) return;
 
     this._loading.set(true);
@@ -45,7 +52,11 @@ export class PokemonStore {
     });
   }
 
-  // Accès rapide à un Pokémon par id sans refaire d'appel
+  /**
+   * Récupère un Pokémon par son ID depuis le cache.
+   * @param id id du Pokémon dans le Pokédex
+   * @returns le Pokémon correspondant ou undefined si non trouvé
+   */
   getById(id: number): Pokemon | undefined {
     return this._pokemons().find(p => p.id === id);
   }

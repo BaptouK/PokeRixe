@@ -1,6 +1,6 @@
 import {
   AfterViewInit, Component, ComponentRef, DestroyRef,
-  effect, EffectRef, ElementRef, inject, ViewChild, ViewContainerRef
+  effect, inject, ViewChild, ViewContainerRef
 } from '@angular/core';
 import {Card} from '../../shared/components/card/card';
 import {Pokemon} from '../../shared/models/pokemon.model';

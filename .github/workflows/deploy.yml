@@ -34,6 +34,7 @@ jobs:
           ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "
             docker pull ghcr.io/baptouk/pokerixe-front:latest &&
             cd ~/pokerixe/ &&
+            docker compose down &&
             docker compose up -d
           "
           rm private_key

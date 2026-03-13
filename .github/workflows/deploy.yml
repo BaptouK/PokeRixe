@@ -21,11 +21,12 @@ jobs:
         id: pkg
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-
       - name: Build & Push image
         run: |
-            docker build -t pokerixe:${{ steps.pkg.outputs.version }} .
-            docker tag pokerixe:${{ steps.pkg.outputs.version }} pokerixe:latest
+          docker build -t ghcr.io/${{ github.repository_owner }}/pokerixe-front:${{ steps.pkg.outputs.version }} .
+          docker tag ghcr.io/${{ github.repository_owner }}/pokerixe-front:${{ steps.pkg.outputs.version }} ghcr.io/${{ github.repository_owner }}/pokerixe-front:latest
+          docker push ghcr.io/${{ github.repository_owner }}/pokerixe-front:${{ steps.pkg.outputs.version }}
+          docker push ghcr.io/${{ github.repository_owner }}/pokerixe-front:latest
 
       - name: Notifier le serveur
         run: |

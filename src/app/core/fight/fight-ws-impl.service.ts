@@ -1,7 +1,7 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {encode, decode} from '@msgpack/msgpack';
 import {ConnectionStatus, FightWsService} from './fight-ws.service';
-import {FightPhase, FightPokemonState, FightState, TurnEvent} from './fight.model';
+import {CurrentPokemonState, FightPhase, FightState, OpponentPokemonState, Turn} from './fight.model';
 import {Message, Packet, PacketMap} from './fight-ws.model';
 import {environment} from '../../../environments/environment';
 import {AuthService} from '../auth/auth.service';
@@ -14,12 +14,12 @@ export class FightWsServiceImpl extends FightWsService {
   private readonly BASE = environment.apiUrl;
 
   private readonly _phase = signal<FightPhase | null>(null);
-  private readonly _playerActivePokemon = signal<FightPokemonState | null>(null);
-  private readonly _opponentActivePokemon = signal<FightPokemonState | null>(null);
-  private readonly _playerTeam = signal<FightPokemonState[]>([]);
+  private readonly _playerActivePokemon = signal<CurrentPokemonState | null>(null);
+  private readonly _opponentActivePokemon = signal<OpponentPokemonState | null>(null);
+  private readonly _playerTeam = signal<CurrentPokemonState[]>([]);
   private readonly _playerHasActed = signal<boolean>(false);
   private readonly _mustSwitch = signal<boolean>(false);
-  private readonly _log = signal<TurnEvent[]>([]);
+  private readonly _log = signal<Turn[]>([]);
   private readonly _winner = signal<string | null>(null);
   private readonly _isFinished = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
@@ -28,6 +28,7 @@ export class FightWsServiceImpl extends FightWsService {
   private readonly _playerName = signal<string>('');
   private readonly _opponentRemainingCount = signal<number>(0);
   private readonly _isPendingAction = signal<boolean>(false);
+  private readonly _playerActiveIndex = signal<number>(0);
 
   readonly phase = this._phase.asReadonly();
   readonly playerActivePokemon = this._playerActivePokemon.asReadonly();
@@ -44,6 +45,7 @@ export class FightWsServiceImpl extends FightWsService {
   readonly playerName = this._playerName.asReadonly();
   readonly opponentRemainingCount = this._opponentRemainingCount.asReadonly();
   readonly isPendingAction = this._isPendingAction.asReadonly();
+  readonly playerActiveIndex = this._playerActiveIndex.asReadonly();
 
   private ws: WebSocket | null = null;
   private userId: string | null = null;
@@ -83,16 +85,17 @@ export class FightWsServiceImpl extends FightWsService {
     const user = this.authService.currentUser();
     if (!user) return;
 
-    this.sendPacket('JoinPacket', {userId: user.id, username: user.pseudo});
+    this.sendPacket('JoinPacket', {userId: user.id});
   }
 
-  sendAttack(moveSlot: number, pokemonSlot: number): void {
+  sendAttack(moveSlot: number): void {
     this._isPendingAction.set(true);
 
-    this.sendPacket('AttackPacket', {moveSlot, pokemonSlot});
+    this.sendPacket('AttackPacket', {moveSlot});
   }
 
   sendSwitch(slotIndex: number): void {
+    this._mustSwitch.set(false);
     this._isPendingAction.set(true);
 
     this.sendPacket('SwitchPacket', {switchToSlotIndex: slotIndex});
@@ -146,18 +149,21 @@ export class FightWsServiceImpl extends FightWsService {
     ws.onmessage = (event: MessageEvent<ArrayBuffer>) => {
       try {
         const message = decode(event.data) as Message;
+        console.log('[WS] message reçu:', message);
         this.handleMessage(message);
-      } catch {
+      } catch (err) {
+        console.error('[WS] erreur handleMessage:', err);
         this._error.set('Message serveur invalide');
       }
     };
 
     ws.onclose = (event: CloseEvent) => {
-      if (event.code === 1000) {
+      if (event.code === 1000 && !this._isFinished()) {
         this.reset();
-      } else {
+      } else if (event.code !== 1000) {
         this.handleUnexpectedClose();
       }
+      // Si code 1000 et partie terminée : on laisse l'état intact pour afficher le gagnant
     };
 
     ws.onerror = () => {
@@ -168,29 +174,30 @@ export class FightWsServiceImpl extends FightWsService {
   private handleMessage(msg: Message): void {
     switch (msg.type) {
       case 'GameStartPacket':
+        console.log(msg.data);
         this._connectionStatus.set('playing');
+        console.log("Game started by the server");
         break;
 
       case 'FullStatePacket':
-        this.applyState(msg.data);
-        this._connectionStatus.set('playing');
-        this._isPendingAction.set(false);
+        this.applyState(msg.data.game);
         break;
 
       case 'AttackPacket':
       case 'SwitchPacket':
         break;
+      case 'MustSwichPacket':
+        this._isPendingAction.set(false);
+        this._mustSwitch.set(true);
+        break;
       case 'JoinPacket':
         const joinUserId = msg.data.userId;
-        if (joinUserId === this.userId) return;
+        if (joinUserId === this.userId) return;                     
 
         /*
          * Un utilisateur vient de rejoindre la partie, on en déduit que c'est le joueur numéro 2
          */
-        this._opponentName.set(msg.data.username);
-
         break;
-
       default: {
         const _exhaustiveCheck: never = msg;
         console.warn('Unhandled packet', _exhaustiveCheck);
@@ -199,18 +206,21 @@ export class FightWsServiceImpl extends FightWsService {
   }
 
   private applyState(state: FightState): void {
-    this._phase.set(state.phase);
-    this._playerActivePokemon.set(state.playerActivePokemon);
-    this._opponentActivePokemon.set(state.opponentActivePokemon);
-    this._playerTeam.set(state.playerTeam);
+    this._isPendingAction.set(false);
+    this._phase.set(state.FightPhase);
+    this._playerActiveIndex.set(state.player.indexActivePokemon);
+    this._playerActivePokemon.set(state.player.pokemons[state.player.indexActivePokemon]);
+    this._opponentActivePokemon.set(state.opponent.pokemons[state.opponent.indexActivePokemon]);
+    this._playerTeam.set(state.player.pokemons);
     this._playerHasActed.set(state.playerHasActed);
     this._mustSwitch.set(state.mustSwitch);
-    this._log.set(state.log);
-    this._winner.set(state.winner);
-    this._isFinished.set(state.phase === 'finished');
-    this._opponentName.set(state.opponentName);
-    this._playerName.set(state.playerName);
-    this._opponentRemainingCount.set(state.opponentRemainingCount);
+    this._log.set(state.turns);
+    this._winner.set(state.winner || null);
+    this._isFinished.set(state.FightPhase === 'finished');
+    this._opponentName.set(state.opponent.pseudo);
+    this._playerName.set(state.player.pseudo);
+    this._opponentRemainingCount.set(state.opponent.pokemons.filter(p => p.currentHp > 0).length);
+
   }
 
   private handleUnexpectedClose(): void {

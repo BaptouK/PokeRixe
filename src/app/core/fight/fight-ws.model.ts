@@ -1,5 +1,7 @@
 import { FightState } from './fight.model';
 
+export type PlayerStatus = 'WAITING_ACTION' | 'MUST_SWITCH';
+
 /**
  * Generic Packet Structure
  */
@@ -12,7 +14,6 @@ export type Packet<TType extends string, TData> = {
 
 export type AttackData = {
   moveSlot: number;
-  pokemonSlot: number;
 };
 
 export type SwitchData = {
@@ -21,16 +22,17 @@ export type SwitchData = {
 
 export type JoinData = {
   userId: string;
-  username: string;
 };
 
 export interface PacketMap {
   AttackPacket: AttackData;
   SwitchPacket: SwitchData;
+  MustSwichPacket: {};
   JoinPacket: JoinData;
-  FullStatePacket: FightState;
+  FullStatePacket: { game: FightState };
   GameStartPacket: {};
 }
+
 
 export type Message = {
   [K in keyof PacketMap]: Packet<K, PacketMap[K]>

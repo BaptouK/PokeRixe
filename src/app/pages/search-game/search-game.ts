@@ -68,9 +68,20 @@ export class SearchGame {
    * Le nombre de Pokémon est calculé automatiquement d'après les slots non nuls de l'équipe.
    */
   submitCreateGame() {
-    const nombrePokemon = this.teamSlots.filter(s => !!s).length || 1;
-    this.gamesService.createGame(this.description()).subscribe({
+    const idx = this.selectedTeamSlot();
+    if (idx === null) {
+      console.warn('No pokemon selected to join the game');
+      return;
+    }
+    const slot = this.teamSlots[idx];
+    if (!slot) {
+      console.warn('Selected slot is empty, cannot join');
+      return;
+    }
+
+    this.gamesService.createGame(this.description(),idx).subscribe({
       next: (game) => {
+        this.gamesService.setCurrentGameId(game.gameId);
         this.closeCreateGame();
         this.router.navigate(['/fight', game.gameId]);
       },
@@ -131,7 +142,7 @@ export class SearchGame {
     // Call the GameService to join. subscribe to handle result or error
     this.gamesService.joinGame(gameId, idx).subscribe({
       next: (_) => {
-        console.log("Arrah! Successfully joined game, navigating to fight...");
+        this.gamesService.setCurrentGameId(gameId);
         this.closeJoinModal();
         this.router.navigate(['/fight', gameId]);
       },

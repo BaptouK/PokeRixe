@@ -35,6 +35,8 @@ export class HistoryPage implements AfterViewInit, OnDestroy {
   @ViewChild('sentinel') private sentinelRef!: ElementRef<HTMLElement>;
   private observer?: IntersectionObserver;
 
+
+
   constructor() {
     this.historyService.loadHistory().subscribe(() => {
       const first = this.filteredHistory()[0];

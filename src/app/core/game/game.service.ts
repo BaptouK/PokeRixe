@@ -21,12 +21,15 @@ export class GameService {
 
   private readonly _games = signal<GamePlay[]>([]);
   private readonly _currentGame = signal<GamePlay | null>(null);
+  private readonly _currentGameId = signal<string | null>(null);
   private readonly _isLoading = signal(false);
 
   /** Signal en lecture seule exposant la liste des parties disponibles. */
   readonly games = this._games.asReadonly();
   /** Signal en lecture seule exposant la partie dans laquelle le joueur se trouve, ou `null`. */
   readonly currentGame = this._currentGame.asReadonly();
+  /** Signal en lecture seule exposant l'ID de la partie en cours, ou `null`. */
+  readonly currentGameId = this._currentGameId.asReadonly();
   /** Signal en lecture seule indiquant qu'un chargement est en cours. */
   readonly isLoading = this._isLoading.asReadonly();
 
@@ -50,8 +53,8 @@ export class GameService {
    * Crée une nouvelle partie et l'ajoute à la liste locale.
    * Le backend retourne la partie créée avec son id et player1 résolu.
    */
-  createGame(description: string): Observable<GameCreationData> {
-    const params = new HttpParams().set('description', description);
+  createGame(description: string, pokemonTeamSlot : number): Observable<GameCreationData> {
+    const params = new HttpParams().set('description', description).set('pokemonTeamSlot', pokemonTeamSlot);
     return this.http.post<GameCreationData>(`${this.BASE}games`, {}, {params}).pipe(
       tap((game) => {
         localStorage.setItem('fightToken', game.token);
@@ -79,8 +82,13 @@ export class GameService {
   /**
    * Efface la partie courante localement (utilisé après la fin du combat).
    */
+  setCurrentGameId(id: string): void {
+    this._currentGameId.set(id);
+  }
+
   clearCurrentGame(): void {
     this._currentGame.set(null);
+    this._currentGameId.set(null);
   }
 
   /**

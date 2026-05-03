@@ -13,7 +13,6 @@ import {environment} from '../environments/environment';
 import {authInterceptor} from './core/auth/auth.interceptor';
 import {AuthService} from './core/auth/auth.service';
 import {FightWsService} from './core/fight/fight-ws.service';
-import {FightWsMockService} from './core/fight/fight-ws-mock.service';
 import {FightWsServiceImpl} from './core/fight/fight-ws-impl.service';
 
 export const appConfig: ApplicationConfig = {
@@ -27,10 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       inject(AuthService).loadCurrentUser();
     }),
-    {
-      provide: FightWsService,
-      useClass: environment.useMockApi ? FightWsMockService : FightWsServiceImpl,
-    },
+    { provide: FightWsService, useClass: FightWsServiceImpl },
   ]
 };
 

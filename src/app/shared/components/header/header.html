@@ -14,14 +14,16 @@
 
     } @else if (auth.isAuthenticated()) {
       <ul class="nav-list">
-        @if (game.currentGame()) {
-          <li class="nav-item nav-item--fight font-basic" routerLinkActive="active"><a routerLink="fight">⚔ Fight</a></li>
+        @if (game.currentGameId() && (fightConnectionStatus() === 'waiting' || fightConnectionStatus() === 'playing')) {
+          <li class="nav-item nav-item--fight font-basic" routerLinkActive="active"><a [routerLink]="['fight', game.currentGameId()]">⚔ Fight</a></li>
         }
         <li class="nav-item font-basic" routerLinkActive="active"><a routerLink="pokedex">Pokedex</a></li>
         <li class="nav-item font-basic" routerLinkActive="active"><a routerLink="equipes">Equipes</a></li>
+        @if (!(game.currentGameId() && (fightConnectionStatus() === 'waiting' || fightConnectionStatus() === 'playing'))) {
         <li class="nav-item font-basic" routerLinkActive="active"><a routerLink="searchGame">Parties</a></li>
         <li class="nav-item font-basic" routerLinkActive="active"><a routerLink="history">Historique</a></li>
-      </ul>
+        }
+     </ul>
       <div class="nav-user font-basic" routerLinkActive="active"><a routerLink="user">{{auth.currentUser()?.pseudo}}</a></div>
     }
 

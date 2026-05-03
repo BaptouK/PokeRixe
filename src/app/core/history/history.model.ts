@@ -1,4 +1,4 @@
-import { TurnEvent } from '../fight/fight.model';
+import { Turn } from '../fight/fight.model';
 
 export type GameResult = 'win' | 'loss';
 
@@ -10,12 +10,12 @@ export interface HistoryPokemon {
 }
 
 export interface GameHistoryEntry {
-  id: number;
+  id: string;
   date: string;
   opponentName: string;
   result: GameResult;
   turnCount: number;
   playerTeam: HistoryPokemon[];
   opponentTeam: HistoryPokemon[];
-  log: TurnEvent[];
+  log: Turn[];
 }

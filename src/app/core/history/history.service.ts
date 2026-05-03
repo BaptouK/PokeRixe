@@ -1,8 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../../shared/models/api-response.model';
 import { GameHistoryEntry } from './history.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,8 +20,7 @@ export class HistoryService {
 
   loadHistory(): Observable<GameHistoryEntry[]> {
     this._isLoading.set(true);
-    return this.http.get<ApiResponse<GameHistoryEntry[]>>(`${this.BASE}games/history`).pipe(
-      map((r) => r.data),
+    return this.http.get<GameHistoryEntry[]>(`${this.BASE}games/history`).pipe(
       tap({
         next: (entries) => {
           this._history.set(entries);

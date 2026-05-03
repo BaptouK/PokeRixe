@@ -6,7 +6,7 @@
 
       <article class="search-card card">
         <header class="search-card-header">
-          <h2 class="search-card-host">Host : </h2>
+          <h2 class="search-card-host">Host : {{ game.players[0]?.pseudo }}</h2>
           <div class="search-card-meta">
             Nombre de pokémons :
             <span class="badge">{{ game.pokemonCount ?? 0 }}</span>
@@ -16,7 +16,6 @@
           Description :<br> {{ game.description || 'Aucune description' }}
         </p>
         <footer class="search-card-actions">
-          <!-- set the selectedGameId then open the modal (keeps template type-checker happy) -->
           <button class="little-button join-button" (click)="selectedGameId.set(game.id); openJoinModal()">Rejoindre</button>
         </footer>
 
@@ -31,17 +30,34 @@
   </button>
 
   @if (createModalOpen()) {
+    
     <div class="create-game-backdrop" (click)="closeCreateGame()"></div>
 
     <dialog class="create-game-container" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <h2>Créer une partie</h2>
+      <h2>Creer une partie</h2>
 
       <label for="game-desc">Description</label>
       <input id="game-desc" type="text" [value]="description()" (input)="description.set($any($event.target).value)"
              placeholder="Petit texte pour ta partie..."/>
 
+      <div class="team-slots">
+        @for (slot of teamSlots; track slot; let i = $index) {
+          <div class="team-slot" (click)="slot ? selectTeamSlot(i) : null" [class.selected]="selectedTeamSlot() === i"
+               [class.disabled]="!slot">
+            @if (slot) {
+              <img src="{{ slot.sprite }}" alt="{{ slot.name }}"/>
+              <div class="slot-name">{{ slot.name }}</div>
+            } @else {
+              <div class="slot-empty">Empty</div>
+            }
+          </div>
+        }
+      </div>
+
       <div class="create-game-actions">
-        <button class="little-button" type="button" (click)="submitCreateGame()">Créer</button>
+        <button class="little-button" type="button" (click)="submitCreateGame()" [disabled]="selectedTeamSlot() === null">
+          Rejoindre
+        </button>
         <button class="little-button" type="button" (click)="closeCreateGame()">Annuler</button>
       </div>
     </dialog>

@@ -25,7 +25,8 @@ export class HistoryPage implements AfterViewInit, OnDestroy {
   readonly filteredHistory = computed(() => {
     const filter = this.filterResult();
     const all = this.historyService.history();
-    return filter === 'all' ? all : all.filter((g) => g.result === filter);
+    const filtered = filter === 'all' ? all : all.filter((g) => g.result === filter);
+    return [...filtered].reverse();
   });
 
   readonly visibleHistory = computed(() => this.filteredHistory().slice(0, this.visibleCount()));
@@ -86,5 +87,9 @@ export class HistoryPage implements AfterViewInit, OnDestroy {
       month: '2-digit',
       year: 'numeric',
     });
+  }
+
+  objectEntries(obj: Record<string, number>): [string, number][] {
+    return Object.entries(obj);
   }
 }

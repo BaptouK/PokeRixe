@@ -39,10 +39,11 @@
               <app-type type="{{ type }}"></app-type>
             }
           </div>
-          <p>Machin bidule fait truc muche et vit dans les marraiscage </p>
+
+            <p>{{ description || 'Aucune description disponible.' }}</p>
         </div>
         <div class="btn-bas-droite">
-          <button  class="little-button baba" (click)="removePoke()" >Supprimer le pokémon</button>
+          <button  class="save-btn " (click)="removePoke()" >Supprimer le pokémon</button>
 
         </div>
         

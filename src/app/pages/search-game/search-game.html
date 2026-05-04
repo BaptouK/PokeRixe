@@ -9,7 +9,7 @@
           <h2 class="search-card-host">Host : {{ game.players[0]?.pseudo }}</h2>
           <div class="search-card-meta">
             Nombre de pokémons :
-            <span class="badge">{{ game.pokemonCount ?? 0 }}</span>
+            <span class="badge">{{ game.pokemonCount }}</span>
           </div>
         </header>
         <p class="search-card-desc">
@@ -25,7 +25,7 @@
 
   </div>
 
-  <button class="create-game-button little-button" aria-label="Créer une parties" (click)="openCreateGame()">Créer une
+  <button class="create-game-button little-button" aria-label="Créer une partie" (click)="openCreateGame()">Créer une
     parties
   </button>
 
@@ -55,10 +55,10 @@
       </div>
 
       <div class="create-game-actions">
-        <button class="little-button" type="button" (click)="submitCreateGame()" [disabled]="selectedTeamSlot() === null">
-          Rejoindre
-        </button>
         <button class="little-button" type="button" (click)="closeCreateGame()">Annuler</button>
+        <button class="little-button" type="button" (click)="submitCreateGame()" [disabled]="selectedTeamSlot() === null">
+          Créer
+        </button>
       </div>
     </dialog>
   }

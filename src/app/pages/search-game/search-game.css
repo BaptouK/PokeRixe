@@ -187,6 +187,19 @@
   box-shadow: 0 8px 20px rgba(255,215,0,0.12);
 }
 
+.save-btn{
+  padding: 0.45rem 1.1rem;
+  border-radius: 6px;
+  border: none;
+  background: #e53935;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+
 @media (max-width: 480px) {
   .search-card {
     width: calc(100% - 2rem);

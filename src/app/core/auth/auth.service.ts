@@ -60,7 +60,7 @@ export class AuthService {
       next: (user: User) => {
         this._currentUser.set(user);
         this.loadCurrentUser();
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl('/login');
       },
       error: (err) => {
         console.error('Registration failed', err);
@@ -97,7 +97,12 @@ export class AuthService {
       next: (user: User) => {
         if (user) {
           this._currentUser.set(user);
+<<<<<<< HEAD
           this.team.loadTeamFromUser(user.team, user.mail).subscribe();
+=======
+          this.team.loadTeam(user.id).subscribe();
+          this.router.navigateByUrl('/');
+>>>>>>> 8bcad79 (:bug: fix  routing after register)
         }
       },
       error: (err) => {

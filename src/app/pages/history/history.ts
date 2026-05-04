@@ -3,7 +3,7 @@ import { FightLog } from '../../shared/components/fight-log/fight-log';
 import { HistoryService } from '../../core/history/history.service';
 import { GameHistoryEntry } from '../../core/history/history.model';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-history',
@@ -34,6 +34,8 @@ export class HistoryPage implements AfterViewInit, OnDestroy {
 
   @ViewChild('sentinel') private sentinelRef!: ElementRef<HTMLElement>;
   private observer?: IntersectionObserver;
+
+
 
   constructor() {
     this.historyService.loadHistory().subscribe(() => {

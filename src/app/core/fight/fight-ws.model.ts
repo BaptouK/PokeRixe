@@ -1,28 +1,39 @@
 import { FightState } from './fight.model';
 
-export type ClientAttackMessage = {
-  type: 'attack';
-  moveSlot: number;
-  pokemonSlot: number;
+export type PlayerStatus = 'WAITING_ACTION' | 'MUST_SWITCH';
+
+/**
+ * Generic Packet Structure
+ */
+export type Packet<TType extends string, TData> = {
+  token: string;
+  type: TType;
+  data: TData;
 };
 
-export type ClientSwitchMessage = {
-  type: 'switch';
+
+export type AttackData = {
+  moveSlot: number;
+};
+
+export type SwitchData = {
   switchToSlotIndex: number;
 };
 
-export type ClientMessage = ClientAttackMessage | ClientSwitchMessage;
-
-export type WaitingOpponentMessage = { type: 'waiting_opponent' };
-
-export type FullStateMessage = {
-  type: 'full_state';
-  payload: FightState;
+export type JoinData = {
+  userId: string;
 };
 
-export type ErrorMessage = {
-  type: 'error';
-  message: string;
-};
+export interface PacketMap {
+  AttackPacket: AttackData;
+  SwitchPacket: SwitchData;
+  MustSwichPacket: {};
+  JoinPacket: JoinData;
+  FullStatePacket: { game: FightState };
+  GameStartPacket: {};
+}
 
-export type ServerMessage = WaitingOpponentMessage | FullStateMessage | ErrorMessage;
+
+export type Message = {
+  [K in keyof PacketMap]: Packet<K, PacketMap[K]>
+}[keyof PacketMap];

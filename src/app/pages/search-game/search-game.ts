@@ -40,7 +40,7 @@ export class SearchGame {
   /** Index du slot d'équipe sélectionné pour rejoindre (`null` si aucun). */
   selectedTeamSlot = signal<number | null>(null);
   /** Identifiant de la partie que l'utilisateur souhaite rejoindre. */
-  selectedGameId = signal<number | null>(null);
+  selectedGameId = signal<string | null>(null);
 
   constructor() {
     this.gamesService.loadGames().subscribe();
@@ -68,12 +68,22 @@ export class SearchGame {
    * Le nombre de Pokémon est calculé automatiquement d'après les slots non nuls de l'équipe.
    */
   submitCreateGame() {
-    const nombrePokemon = this.teamSlots.filter(s => !!s).length || 1;
-    this.gamesService.createGame({ description: this.description(), nombrePokemon }).subscribe({
+    const idx = this.selectedTeamSlot();
+    if (idx === null) {
+      console.warn('No pokemon selected to join the game');
+      return;
+    }
+    const slot = this.teamSlots[idx];
+    if (!slot) {
+      console.warn('Selected slot is empty, cannot join');
+      return;
+    }
+
+    this.gamesService.createGame(this.description(),idx).subscribe({
       next: (game) => {
+        this.gamesService.setCurrentGameId(game.gameId);
         this.closeCreateGame();
-        this.fightWsService.connect(game.id);
-        this.router.navigate(['/fight', game.id]);
+        this.router.navigate(['/fight', game.gameId]);
       },
       error: (err) => console.error('Failed to create game', err),
     });
@@ -81,7 +91,6 @@ export class SearchGame {
 
   /**
    * Ouvre la modale de sélection du Pokémon pour rejoindre une partie.
-   * @param gameId Identifiant de la partie à rejoindre (à définir avant d'appeler)
    */
   openJoinModal() {
     this.joinModalOpen.set(true);
@@ -131,11 +140,11 @@ export class SearchGame {
     console.log(`Joining game ${gameId} with ${nombrePokemon} pokemons (selected slot ${idx})`);
 
     // Call the GameService to join. subscribe to handle result or error
-    this.gamesService.joinGame(gameId).subscribe({
-      next: (game) => {
+    this.gamesService.joinGame(gameId, idx).subscribe({
+      next: (_) => {
+        this.gamesService.setCurrentGameId(gameId);
         this.closeJoinModal();
-        this.fightWsService.connect(game.id);
-        this.router.navigate(['/fight', game.id]);
+        this.router.navigate(['/fight', gameId]);
       },
       error: (err) => {
         console.error('Failed to join game', err);

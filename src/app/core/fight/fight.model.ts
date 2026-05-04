@@ -26,37 +26,64 @@ export type FightPhase = 'waiting_actions' | 'waiting_switch' | 'finished';
  * Représente le point de vue du joueur courant.
  */
 export interface FightState {
-  gameId: number;
+  gameId: string;
   turnNumber: number;
-  phase: FightPhase;
-
-  playerName: string;
-  playerActivePokemon: FightPokemonState;
-  playerTeam: FightPokemonState[];
-
-  opponentName: string;
-  opponentActivePokemon: FightPokemonState;
-  opponentRemainingCount: number;
-
-  /** `true` si le joueur courant a déjà soumis son action pour ce tour. */
+  FightPhase: FightPhase;
+  player: CurrentPlayer;
+  opponent: OpponentPlayer;
   playerHasActed: boolean;
-
-  /** `true` si c'est au joueur de choisir un remplaçant (phase `waiting_switch`). */
   mustSwitch: boolean;
-
-  log: TurnEvent[];
-  winner: string | null;
+  turns: Turn[];
+  winner: string;
 }
 
+export interface CurrentPlayer {
+  pseudo: string;
+  indexActivePokemon: number;
+  pokemons: CurrentPokemonState[];
+}
+
+export interface OpponentPlayer {
+  pseudo: string;
+  indexActivePokemon: number;
+  pokemons: OpponentPokemonState[];
+}
+
+export interface CurrentPokemonState {
+  name: string;
+  currentHp: number;
+  maxHp: number;
+  urlImageFront: string;
+  urlImageBack: string;
+  attacks: AttackState[];
+}
+
+export interface OpponentPokemonState {
+  name: string;
+  currentHp: number;
+  maxHp: number;
+  urlImageFront: string;
+}
+
+export interface AttackState {
+  name: string;
+  power: number | null;
+  accuracy: number | null;
+  type: string;
+}
+
+
 /** Type d'un événement dans le journal de combat. */
-export type TurnEventType = 'turn_start' | 'attack' | 'damage' | 'faint' | 'switch' | 'fight_end';
+export type ActionType = 'turn_start' | 'attack' | 'damage' | 'faint' | 'switch' | 'fight_end';
 
 /**
  * Événement individuel dans le journal de combat.
  */
-export interface TurnEvent {
-  turn: number;
-  type: TurnEventType;
-  message: string;
+export interface Turn {
+  actions : Action[];
 }
 
+export interface Action {
+  actionType : String;
+  actionDescription : string;
+}

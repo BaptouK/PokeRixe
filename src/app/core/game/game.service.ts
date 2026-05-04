@@ -1,9 +1,11 @@
-import {Injectable, signal} from '@angular/core';
-import {CreateGameDTO, Game} from './game.model';
-import {HttpClient} from '@angular/common/http';
+import {inject, Injectable, signal} from '@angular/core';
+import {GameCreationData, GamePlay} from './game.model';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, map, tap} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import { ApiResponse } from '../../shared/models/api-response.model';
+import {User} from '../models/user.model';
+import {AuthService} from '../auth/auth.service';
 
 /**
  * Service de gestion des parties multijoueur.
@@ -17,24 +19,26 @@ export class GameService {
 
   constructor(private readonly http: HttpClient) {}
 
-  private readonly _games = signal<Game[]>([]);
-  private readonly _currentGame = signal<Game | null>(null);
+  private readonly _games = signal<GamePlay[]>([]);
+  private readonly _currentGame = signal<GamePlay | null>(null);
+  private readonly _currentGameId = signal<string | null>(null);
   private readonly _isLoading = signal(false);
 
   /** Signal en lecture seule exposant la liste des parties disponibles. */
   readonly games = this._games.asReadonly();
   /** Signal en lecture seule exposant la partie dans laquelle le joueur se trouve, ou `null`. */
   readonly currentGame = this._currentGame.asReadonly();
+  /** Signal en lecture seule exposant l'ID de la partie en cours, ou `null`. */
+  readonly currentGameId = this._currentGameId.asReadonly();
   /** Signal en lecture seule indiquant qu'un chargement est en cours. */
   readonly isLoading = this._isLoading.asReadonly();
 
   /**
    * Récupère la liste des parties en attente depuis le backend et met à jour le signal.
    */
-  loadGames(): Observable<Game[]> {
+  loadGames(): Observable<GamePlay[]> {
     this._isLoading.set(true);
-    return this.http.get<ApiResponse<Game[]>>(`${this.BASE}games`).pipe(
-      map(r => r.data),
+    return this.http.get<GamePlay[]>(`${this.BASE}games/available`).pipe(
       tap({
         next: (games) => {
           this._games.set(games);
@@ -49,12 +53,11 @@ export class GameService {
    * Crée une nouvelle partie et l'ajoute à la liste locale.
    * Le backend retourne la partie créée avec son id et player1 résolu.
    */
-  createGame(dto: CreateGameDTO): Observable<Game> {
-    return this.http.post<ApiResponse<Game>>(`${this.BASE}games`, dto).pipe(
-      map(r => r.data),
+  createGame(description: string, pokemonTeamSlot : number): Observable<GameCreationData> {
+    const params = new HttpParams().set('description', description).set('pokemonTeamSlot', pokemonTeamSlot);
+    return this.http.post<GameCreationData>(`${this.BASE}games`, {}, {params}).pipe(
       tap((game) => {
-        this._games.update(games => [...games, game]);
-        this._currentGame.set(game);
+        localStorage.setItem('fightToken', game.token);
       }),
     );
   }
@@ -63,21 +66,29 @@ export class GameService {
    * Rejoint une partie existante en tant que player2.
    * Met à jour la partie dans la liste et la définit comme partie courante.
    */
-  joinGame(gameId: number): Observable<Game> {
-    return this.http.post<ApiResponse<Game>>(`${this.BASE}games/${gameId}/join`, {}).pipe(
-      map(r => r.data),
-      tap((game) => {
-        this._games.update(games => games.map(g => g.id === game.id ? game : g));
-        this._currentGame.set(game);
-      }),
+  joinGame(gameId: string, selectSlotPokemon: number): Observable<string> {
+    const params = new HttpParams().set('selectSlotPokemon', selectSlotPokemon);
+
+    return this.http.post(`${this.BASE}games/${gameId}/join`, {}, {
+      params,
+      responseType: 'text'
+    }).pipe(
+      tap((token) => {
+        localStorage.setItem('fightToken', token);
+      })
     );
   }
 
   /**
    * Efface la partie courante localement (utilisé après la fin du combat).
    */
+  setCurrentGameId(id: string): void {
+    this._currentGameId.set(id);
+  }
+
   clearCurrentGame(): void {
     this._currentGame.set(null);
+    this._currentGameId.set(null);
   }
 
   /**

@@ -1,18 +1,25 @@
-import { Injectable, signal } from '@angular/core';
-import { encode, decode } from '@msgpack/msgpack';
-import { ConnectionStatus, FightWsService } from './fight-ws.service';
-import { FightPhase, FightPokemonState, FightState, TurnEvent } from './fight.model';
-import { ClientMessage, ServerMessage } from './fight-ws.model';
+import {inject, Injectable, signal} from '@angular/core';
+import {encode, decode} from '@msgpack/msgpack';
+import {ConnectionStatus, FightWsService} from './fight-ws.service';
+import {CurrentPokemonState, FightPhase, FightState, OpponentPokemonState, Turn} from './fight.model';
+import {Message, Packet, PacketMap} from './fight-ws.model';
+import {environment} from '../../../environments/environment';
+import {AuthService} from '../auth/auth.service';
 
 @Injectable()
 export class FightWsServiceImpl extends FightWsService {
+
+  private readonly authService = inject(AuthService);
+
+  private readonly BASE = environment.apiUrl;
+
   private readonly _phase = signal<FightPhase | null>(null);
-  private readonly _playerActivePokemon = signal<FightPokemonState | null>(null);
-  private readonly _opponentActivePokemon = signal<FightPokemonState | null>(null);
-  private readonly _playerTeam = signal<FightPokemonState[]>([]);
+  private readonly _playerActivePokemon = signal<CurrentPokemonState | null>(null);
+  private readonly _opponentActivePokemon = signal<OpponentPokemonState | null>(null);
+  private readonly _playerTeam = signal<CurrentPokemonState[]>([]);
   private readonly _playerHasActed = signal<boolean>(false);
   private readonly _mustSwitch = signal<boolean>(false);
-  private readonly _log = signal<TurnEvent[]>([]);
+  private readonly _log = signal<Turn[]>([]);
   private readonly _winner = signal<string | null>(null);
   private readonly _isFinished = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
@@ -21,6 +28,7 @@ export class FightWsServiceImpl extends FightWsService {
   private readonly _playerName = signal<string>('');
   private readonly _opponentRemainingCount = signal<number>(0);
   private readonly _isPendingAction = signal<boolean>(false);
+  private readonly _playerActiveIndex = signal<number>(0);
 
   readonly phase = this._phase.asReadonly();
   readonly playerActivePokemon = this._playerActivePokemon.asReadonly();
@@ -37,33 +45,60 @@ export class FightWsServiceImpl extends FightWsService {
   readonly playerName = this._playerName.asReadonly();
   readonly opponentRemainingCount = this._opponentRemainingCount.asReadonly();
   readonly isPendingAction = this._isPendingAction.asReadonly();
+  readonly playerActiveIndex = this._playerActiveIndex.asReadonly();
 
   private ws: WebSocket | null = null;
-  private currentGameId: number | null = null;
+  private userId: string | null = null;
+
+  // Reconnection TODO
   private reconnectAttempts = 0;
   private readonly MAX_RECONNECT = 3;
 
-  connect(gameId: number): void {
-    this.currentGameId = gameId;
+  private getToken(): string {
+    return localStorage.getItem('fightToken') ?? '';
+  }
+
+  connect(userId: string): void {
+    this.userId = userId;
     this.reconnectAttempts = 0;
     this._connectionStatus.set('connecting');
-    this.openSocket(gameId);
+    this.openSocket();
   }
 
-  isConnected(gameId: number): boolean {
-    return this.currentGameId === gameId && this.ws?.readyState === WebSocket.OPEN;
+  isConnected(): boolean {
+    return this.ws?.readyState === WebSocket.OPEN;
   }
 
-  sendAttack(moveSlot: number, pokemonSlot: number): void {
-    this._isPendingAction.set(true);
-    const msg: ClientMessage = { type: 'attack', moveSlot, pokemonSlot };
+  sendPacket<T extends keyof PacketMap>(type: T, data: PacketMap[T]): void {
+    const msg: Packet<T, PacketMap[T]> = {
+      token: this.getToken(),
+      type,
+      data
+    };
+
     this.ws?.send(encode(msg));
+  }
+
+  sendJoin(): void {
+    console.log("Sending join message")
+
+    const user = this.authService.currentUser();
+    if (!user) return;
+
+    this.sendPacket('JoinPacket', {userId: user.id});
+  }
+
+  sendAttack(moveSlot: number): void {
+    this._isPendingAction.set(true);
+
+    this.sendPacket('AttackPacket', {moveSlot});
   }
 
   sendSwitch(slotIndex: number): void {
+    this._mustSwitch.set(false);
     this._isPendingAction.set(true);
-    const msg: ClientMessage = { type: 'switch', switchToSlotIndex: slotIndex };
-    this.ws?.send(encode(msg));
+
+    this.sendPacket('SwitchPacket', {switchToSlotIndex: slotIndex});
   }
 
   reset(): void {
@@ -71,7 +106,7 @@ export class FightWsServiceImpl extends FightWsService {
       this.ws.close(1000);
     }
     this.ws = null;
-    this.currentGameId = null;
+    localStorage.removeItem('fightToken');
     this.reconnectAttempts = 0;
     this._phase.set(null);
     this._playerActivePokemon.set(null);
@@ -90,28 +125,45 @@ export class FightWsServiceImpl extends FightWsService {
     this._isPendingAction.set(false);
   }
 
-  private openSocket(gameId: number): void {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const url = `${protocol}://${window.location.host}/api/games/${gameId}/ws`;
+  private openSocket(): void {
+    const protocol = this.BASE.startsWith('https') ? 'wss' : 'ws';
+    const url = `${protocol}://${this.BASE.replace(/^https?:\/\//, '')}ws`;
     const ws = new WebSocket(url);
     ws.binaryType = 'arraybuffer';
     this.ws = ws;
 
+
+    ws.onopen = () => {
+      console.log("WS connected");
+      this._connectionStatus.set('waiting');
+
+      /*
+       * Le protocole demande à ce que chaque client qui rejoint le websocket, doit envoyer un JoinPacket avec son token
+       * pour le faire rejoindre une partie.
+       *
+       * Le websocket est partagé entre tout le monde mais ce qui identifie les joueurs c'est le token qui est donné par le serveur
+       */
+      this.sendJoin();
+    };
+
     ws.onmessage = (event: MessageEvent<ArrayBuffer>) => {
       try {
-        const msg = decode(event.data) as ServerMessage;
-        this.handleMessage(msg);
-      } catch {
+        const message = decode(event.data) as Message;
+        console.log('[WS] message reçu:', message);
+        this.handleMessage(message);
+      } catch (err) {
+        console.error('[WS] erreur handleMessage:', err);
         this._error.set('Message serveur invalide');
       }
     };
 
     ws.onclose = (event: CloseEvent) => {
-      if (event.code === 1000) {
+      if (event.code === 1000 && !this._isFinished()) {
         this.reset();
-      } else {
+      } else if (event.code !== 1000) {
         this.handleUnexpectedClose();
       }
+      // Si code 1000 et partie terminée : on laisse l'état intact pour afficher le gagnant
     };
 
     ws.onerror = () => {
@@ -119,44 +171,70 @@ export class FightWsServiceImpl extends FightWsService {
     };
   }
 
-  private handleMessage(msg: ServerMessage): void {
-    if (msg.type === 'waiting_opponent') {
-      this._connectionStatus.set('waiting_opponent');
-    } else if (msg.type === 'full_state') {
-      this.applyState(msg.payload);
-      this._connectionStatus.set('in_fight');
-      this._isPendingAction.set(false);
-    } else if (msg.type === 'error') {
-      this._error.set(msg.message);
-      this._isPendingAction.set(false);
+  private handleMessage(msg: Message): void {
+    switch (msg.type) {
+      case 'GameStartPacket':
+        console.log(msg.data);
+        this._connectionStatus.set('playing');
+        console.log("Game started by the server");
+        break;
+
+      case 'FullStatePacket':
+        this.applyState(msg.data.game);
+        break;
+
+      case 'AttackPacket':
+      case 'SwitchPacket':
+        break;
+      case 'MustSwichPacket':
+        this._isPendingAction.set(false);
+        this._mustSwitch.set(true);
+        break;
+      case 'JoinPacket':
+        const joinUserId = msg.data.userId;
+        if (joinUserId === this.userId) return;                     
+
+        /*
+         * Un utilisateur vient de rejoindre la partie, on en déduit que c'est le joueur numéro 2
+         */
+        break;
+      default: {
+        const _exhaustiveCheck: never = msg;
+        console.warn('Unhandled packet', _exhaustiveCheck);
+      }
     }
   }
 
   private applyState(state: FightState): void {
-    this._phase.set(state.phase);
-    this._playerActivePokemon.set(state.playerActivePokemon);
-    this._opponentActivePokemon.set(state.opponentActivePokemon);
-    this._playerTeam.set(state.playerTeam);
+    this._isPendingAction.set(false);
+    this._phase.set(state.FightPhase);
+    this._playerActiveIndex.set(state.player.indexActivePokemon);
+    this._playerActivePokemon.set(state.player.pokemons[state.player.indexActivePokemon]);
+    this._opponentActivePokemon.set(state.opponent.pokemons[state.opponent.indexActivePokemon]);
+    this._playerTeam.set(state.player.pokemons);
     this._playerHasActed.set(state.playerHasActed);
     this._mustSwitch.set(state.mustSwitch);
-    this._log.set(state.log);
-    this._winner.set(state.winner);
-    this._isFinished.set(state.phase === 'finished');
-    this._opponentName.set(state.opponentName);
-    this._playerName.set(state.playerName);
-    this._opponentRemainingCount.set(state.opponentRemainingCount);
+    this._log.set(state.turns);
+    this._winner.set(state.winner || null);
+    this._isFinished.set(state.FightPhase === 'finished');
+    this._opponentName.set(state.opponent.pseudo);
+    this._playerName.set(state.player.pseudo);
+    this._opponentRemainingCount.set(state.opponent.pokemons.filter(p => p.currentHp > 0).length);
+
   }
 
   private handleUnexpectedClose(): void {
-    this._isPendingAction.set(false);
-    if (this.reconnectAttempts < this.MAX_RECONNECT && this.currentGameId !== null) {
-      const delay = Math.pow(2, this.reconnectAttempts) * 1000;
-      this.reconnectAttempts++;
-      setTimeout(() => {
-        if (this.currentGameId !== null) this.openSocket(this.currentGameId);
-      }, delay);
-    } else {
-      this._connectionStatus.set('disconnected');
-    }
+    // this._isPendingAction.set(false); FIXME
+    // if (this.reconnectAttempts < this.MAX_RECONNECT && this.token !== null) {
+    //   const delay = Math.pow(2, this.reconnectAttempts) * 1000;
+    //   this.reconnectAttempts++;
+    //   setTimeout(() => {
+    //     if (this.token !== null) {
+    //       this.openSocket(this.token);
+    //     }
+    //   }, delay);
+    // } else {
+    //   this._connectionStatus.set('disconnected');
+    // }
   }
 }

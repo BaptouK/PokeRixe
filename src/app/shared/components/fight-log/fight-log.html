@@ -1,26 +1,33 @@
 <div class="main-container" #logContainer>
-  @if (events().length === 0) {
+  @if (!hasActions()) {
     <div class="message">
-      <p>Le combat va commencer ! Choisissez votre attaque.</p>
+      @if (turns().length === 0) {
+        <p>Le combat va commencer ! Choisissez votre attaque.</p>
+      } @else {
+        <p>Journal de combat non disponible.</p>
+      }
     </div>
   }
-  @for (event of events(); track $index) {
-    @switch (event.type) {
-      @case ('turn_start') {
-        <div class="message new-turn"><h2>{{ event.message }}</h2></div>
-      }
-      @case ('faint') {
-        <div class="message faint"><p>{{ event.message }}</p></div>
-      }
-      @case ('switch') {
-        <div class="message switch"><p>{{ event.message }}</p></div>
-      }
-      @case ('fight_end') {
-        <div class="message fight-end"><p>{{ event.message }}</p></div>
-      }
-      @default {
-        <div class="message"><p>{{ event.message }}</p></div>
+  @for (turn of turns(); track $index) {
+    @for (action of turn.actions; track $index) {
+      @switch (action.actionType) {
+        @case ('turn_start') {
+          <div class="message new-turn"><h2>{{ action.actionDescription }}</h2></div>
+        }
+        @case ('faint') {
+          <div class="message faint"><p>{{ action.actionDescription }}</p></div>
+        }
+        @case ('switch') {
+          <div class="message switch"><p>{{ action.actionDescription }}</p></div>
+        }
+        @case ('fight_end') {
+          <div class="message fight-end"><p>{{ action.actionDescription }}</p></div>
+        }
+        @default {
+          <div class="message"><p>{{ action.actionDescription }}</p></div>
+        }
       }
     }
   }
+
 </div>

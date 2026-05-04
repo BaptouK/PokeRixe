@@ -26,12 +26,14 @@ export class Header implements OnDestroy {
   game = inject(GameService);
 
   private readonly fightService = inject(FightWsService);
+  readonly fightConnectionStatus = this.fightService.connectionStatus;
   private clearGameTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
       if (this.fightService.isFinished()) {
         this.clearGameTimeout ??= setTimeout(() => {
+          this.fightService.reset();
           this.game.clearCurrentGame();
           this.clearGameTimeout = null;
         }, 5000);

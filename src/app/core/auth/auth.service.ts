@@ -98,7 +98,7 @@ export class AuthService {
         if (user) {
           this._currentUser.set(user);
           this.team.loadTeamFromUser(user.team, user.mail).subscribe();
-          this.router.navigateByUrl('/login')
+          this.router.navigateByUrl('/')
         }
       },
       error: (err) => {

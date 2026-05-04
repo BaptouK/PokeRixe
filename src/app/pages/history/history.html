@@ -132,5 +132,19 @@
 
   <dialog class="ai-modal-container" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
     <h2 class="ai-modal-title">Analyse IA</h2>
+    <p>{{selectedGame()?.analysis?.advice}}</p>
+
+    <p>Score global : {{selectedGame()?.analysis?.score}}</p>
+
+    @if (selectedGame()?.analysis?.scoreByTurn; as scoreByTurn) {
+      <div class="ai-turns">
+        @for (entry of objectEntries(scoreByTurn); track entry[0]) {
+          <div class="ai-turn-row">
+            <span class="ai-turn-label">Score du {{ entry[0] }} : </span>
+            <span class="ai-turn-score">{{ entry[1] }}</span>
+          </div>
+        }
+      </div>
+    }
   </dialog>
 }

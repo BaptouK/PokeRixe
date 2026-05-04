@@ -88,4 +88,8 @@ export class HistoryPage implements AfterViewInit, OnDestroy {
       year: 'numeric',
     });
   }
+
+  objectEntries(obj: Record<string, number>): [string, number][] {
+    return Object.entries(obj);
+  }
 }

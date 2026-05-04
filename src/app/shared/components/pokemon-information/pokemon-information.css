@@ -176,3 +176,15 @@
     display: flex;
   }
 }
+
+.save-btn{
+  padding: 0.45rem 1.1rem;
+  border-radius: 6px;
+  border: none;
+  background: #e53935;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}

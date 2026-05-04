@@ -37,6 +37,8 @@ export class PokemonInformation implements OnChanges {
   /** Index du slot dans l'équipe (0-5). Distingue deux fois le même Pokémon dans l'équipe. */
   slot_index = input<number>(0);
 
+  description: string = '';
+
   isLoading: boolean = true;
   error: string | null = null;
 
@@ -98,9 +100,10 @@ export class PokemonInformation implements OnChanges {
     this.displayedMoves = [];
 
     this.pokemonService.getByIdWithMoves(id).subscribe({
-      next: ({pokemon, moves}) => {
+      next: ({pokemon, moves, description}) => {
         this.pokemon = pokemon;
         this.displayedMoves = moves || [];
+        this.description = description;
         this.movesLoaded.emit(this.displayedMoves);
         this.isLoading = false;
         this.cdr.detectChanges();

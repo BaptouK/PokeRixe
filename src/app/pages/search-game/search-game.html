@@ -55,10 +55,11 @@
       </div>
 
       <div class="create-game-actions">
-        <button class="little-button" type="button" (click)="closeCreateGame()">Annuler</button>
         <button class="little-button" type="button" (click)="submitCreateGame()" [disabled]="selectedTeamSlot() === null">
           Créer
         </button>
+        <button class="little-button" type="button" (click)="closeCreateGame()">Annuler</button>
+
       </div>
     </dialog>
   }
